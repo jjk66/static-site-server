@@ -43,9 +43,31 @@ cd <cloned repo root>
 docker build -t local-droplet-ssh .
 ```
 ### Build the local-droplet-ssh container
-The container will port forward port 22 from container to local port 2222
+The container will port forward port 22 from container to local port 2222 for SSH and forward port 80 from container to local port 8080 for nginx website
 ```bash
-docker run -d --name my-remote-server -p 2222:22 local-droplet-ssh
+docker run -d --name my-remote-server -p 2222:22 -p 8080:80 local-droplet-ssh
+# Verify the webpage is being served
+curl "localhost:8080" # returns the content of index.html
 ```
 
+## Deploy an update to the index.htlm
+After updating the index.html file, run the deploy script which will rsync the updates to the container
+```bash
+./deploy.sh
+```
+Verify using curl to see the update to the index.html file
+```bash
+curl "localhost:8080"
+```
 
+## Cleanup
+Stop and remove the container
+```bash
+docker stop my-remote-server
+docker rm my-remote-server
+```
+
+Remove the test keys
+```bash
+rm ~/.ssh/test_key_*
+```
